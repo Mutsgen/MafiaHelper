@@ -31,6 +31,10 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         onCreate(db)
     }
 
+    public fun checkAndResetDataBase(): Boolean {
+        this.onUpgrade(this.writableDatabase, 1, 1)
+        return true
+    }
     private fun fillIconsTableWithEmojis(db: SQLiteDatabase?) {
         val emojis = mutableListOf<String>()
 
