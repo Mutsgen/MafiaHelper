@@ -3,16 +3,17 @@ package com.example.mafiahelper
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 
 data class Icon(
-    val id: Int,
+    val id: UInt,
     val code: String
 )
-data class Roles(
-    val id: Int,
+data class RoleDTO(
+    val id: UInt,
     val name: String,
     val isBaseRole: Boolean,
     val isDoNight: Boolean,
@@ -46,7 +47,7 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         onCreate(db)
     }
 
-    public fun checkAndResetDataBase(): Boolean {
+    fun checkAndResetDataBase(): Boolean {
         this.onUpgrade(this.writableDatabase, 1, 1)
         return true
     }
@@ -108,12 +109,47 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
             do {
                 val id = cursor.getInt(cursor.getColumnIndex("id"))
                 val code = cursor.getString(cursor.getColumnIndex("code"))
-                icons.add(Icon(id, code))
+                icons.add(Icon(id.toUInt(), code))
             } while (cursor.moveToNext())
         }
 
         cursor.close()
         return icons
+    }
+
+    @SuppressLint("Range")
+    fun getCurentRole(_id: UInt): RoleDTO? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM roles where id = $_id", null)
+        var role: RoleDTO? = null
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    role = cursorToRoleDTO(cursor)
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            // Обработка исключения
+        } finally {
+            cursor.close()
+        }
+
+        return role
+    }
+
+    @SuppressLint("Range")
+    private fun cursorToRoleDTO(cursor: Cursor): RoleDTO {
+        val id = cursor.getInt(cursor.getColumnIndex("id")).toUInt()
+        val name = cursor.getString(cursor.getColumnIndex("name"))
+        val isBaseRole = cursor.getInt(cursor.getColumnIndex("isBaseRole")) > 0
+        val isDoNight = cursor.getInt(cursor.getColumnIndex("isDoNight")) > 0
+        val isCanDie = cursor.getInt(cursor.getColumnIndex("isCanDie")) > 0
+        val team = cursor.getShort(cursor.getColumnIndex("team"))
+        val actFrequency = cursor.getShort(cursor.getColumnIndex("actFrequency"))
+        val icon = cursor.getInt(cursor.getColumnIndex("icon"))
+
+        return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon)
     }
 
 }
