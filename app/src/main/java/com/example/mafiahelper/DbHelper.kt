@@ -7,6 +7,21 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 
+data class Icon(
+    val id: Int,
+    val code: String
+)
+data class Roles(
+    val id: Int,
+    val name: String,
+    val isBaseRole: Boolean,
+    val isDoNight: Boolean,
+    val isCanDie: Boolean,
+    val team: Short,
+    val actFrequency: Short,
+    val icon: Int?
+)
+
 //for create database and fill it from start
 class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?) :
     SQLiteOpenHelper(context, "maffHelperDB", factory, 1) {
@@ -81,6 +96,24 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         }
 
         cursor.close()
+    }
+
+    @SuppressLint("Range")
+    fun getAllIcons(): List<Icon> {
+        val icons = mutableListOf<Icon>()
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM icons", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndex("id"))
+                val code = cursor.getString(cursor.getColumnIndex("code"))
+                icons.add(Icon(id, code))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        return icons
     }
 
 }

@@ -58,6 +58,7 @@ dependencies {
 
     // Choose one of the following:
     // Material Design 3
+    implementation ("androidx.paging:paging-compose:3.2.1")
     implementation("androidx.compose.material3:material3")
     // or Material Design 2
     implementation("androidx.compose.material:material")
