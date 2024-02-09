@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="creteIconTableQuery">CREATE TABLE IF NOT EXISTS icons (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT not null);</string>
-    <string name="createRolesTableQuery">CREATE TABLE IF NOT EXISTS roles (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT not null, isBaseRole boolean not null, isDoNight boolean not null, isCanDie boolean not null, team smallInt not null, actFrequency smallInt not null, icon INTEGER, CONSTRAINT fk_icon    FOREIGN KEY (icon)    REFERENCES icons(id))</string>
+    <string name="createRolesTableQuery">CREATE TABLE IF NOT EXISTS roles (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT not null, isBaseRole boolean not null, isDoNight boolean not null, isCanDie boolean not null, team smallInt not null, actFrequency smallInt not null, icon INTEGER, isDoKill Boolean, isDoSave Boolean, CONSTRAINT fk_icon    FOREIGN KEY (icon)    REFERENCES icons(id))</string>
 </resources>

@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
                     LoadingScreen(navController)
                 }
                 composable("otherScreen") {
-                    // IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
-                    OtherScreen()
+                     IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
+//                    OtherScreen()
                 }
             }
         }
@@ -123,16 +123,14 @@ fun IconSelectionDropdown(icons: List<Icon>) {
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "\t${ selectedIcon?.id.toString() } ${selectedIcon?.code}" ?: "Выберите иконку",
+            text = "\t${ selectedIcon?.id.toString() } ${selectedIcon?.code}",
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = { expanded = true }),
             style = TextStyle(fontSize = 42.sp, color = Color.Black, fontFamily = FontFamily.SansSerif)
         )
-        Spacer(modifier = Modifier.height(20.dp))
         if (expanded) {
             Popup(onDismissRequest = { expanded = false }) {
-                Spacer(modifier = Modifier.height(20.dp))
                 LazyColumn(modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)

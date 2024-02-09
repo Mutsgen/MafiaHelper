@@ -6,6 +6,8 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import androidx.compose.ui.semantics.Role
+import org.w3c.dom.Text
 
 
 data class Icon(
@@ -18,9 +20,12 @@ data class RoleDTO(
     val isBaseRole: Boolean,
     val isDoNight: Boolean,
     val isCanDie: Boolean,
-    val team: Short,
+    val team: Short, // 0 - white, 1 - red, 2 - another
     val actFrequency: Short,
-    val icon: Int?
+    val icon: Int?,
+    val isDoKill: Boolean,
+    val isDoSave: Boolean,
+    val code: String?
 )
 
 //for create database and fill it from start
@@ -37,13 +42,14 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         fillIconsTableWithEmojis(db)
         // create roles table
         db.execSQL(createRolesQuery)
+        fillRolesTableWithStandard(db)
 
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         // drop only immutable tables
         db!!.execSQL("DROP TABLE IF EXISTS icons")
-        db.execSQL("DROP TABLE IF EXISTS role")
+        db.execSQL("DROP TABLE IF EXISTS roles")
         onCreate(db)
     }
 
@@ -83,20 +89,16 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         }
     }
 
-    @SuppressLint("Range")
-    fun printAllIcons() {
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM icons", null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val id = cursor.getInt(cursor.getColumnIndex("id"))
-                val code = cursor.getString(cursor.getColumnIndex("code"))
-                println("ID: $id, Code: $code")
-            } while (cursor.moveToNext())
+    private fun fillRolesTableWithStandard(db: SQLiteDatabase?) {
+        try {
+            db!!.execSQL("insert into roles values(NULL, 'Мирный', 1, 0, 1, 0, 0, 439, 0, 0), " +
+                    "(NULL, 'Мафия', 1, 1, 1, 1, 1, 459, 1, 0), " +
+                    "(NULL, 'Шериф', 1, 1, 1, 0, 1, 231, 0, 0), " +
+                    "(NULL, 'Доктор', 1, 1, 1, 0, 1, 1262, 0, 1)")
         }
-
-        cursor.close()
+        catch (e: Exception) {
+            throw Exception("Incorrect database link")
+        }
     }
 
     @SuppressLint("Range")
@@ -117,8 +119,8 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         return icons
     }
 
-    @SuppressLint("Range")
-    fun getCurentRole(_id: UInt): RoleDTO? {
+
+    fun getCurrentRole(_id: UInt): RoleDTO? {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM roles where id = $_id", null)
         var role: RoleDTO? = null
@@ -130,7 +132,7 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
                 } while (cursor.moveToNext())
             }
         } catch (e: Exception) {
-            // Обработка исключения
+            return null;
         } finally {
             cursor.close()
         }
@@ -148,8 +150,31 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         val team = cursor.getShort(cursor.getColumnIndex("team"))
         val actFrequency = cursor.getShort(cursor.getColumnIndex("actFrequency"))
         val icon = cursor.getInt(cursor.getColumnIndex("icon"))
+        val isDoKill = cursor.getInt(cursor.getColumnIndex("isDoKill")) > 0
+        val isDoSave = cursor.getInt(cursor.getColumnIndex("isDoSave")) > 0
+        val code = cursor.getString(cursor.getColumnIndex("code"))
 
-        return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon)
+        return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon,isDoKill, isDoSave, code)
+    }
+
+    fun getBaseRoles(): List<RoleDTO>? {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT roles.*, icons.code FROM roles, icons where isBaseRole = 1 and icons.id = roles.icon", null)
+        val roles = mutableListOf<RoleDTO>()
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    roles.add(cursorToRoleDTO(cursor))
+                } while (cursor.moveToNext())
+            }
+        } catch (e: Exception) {
+            return null;
+        } finally {
+            cursor.close()
+        }
+
+        return roles
     }
 
 }
