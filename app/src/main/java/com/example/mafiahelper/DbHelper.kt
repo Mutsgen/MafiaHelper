@@ -6,9 +6,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import androidx.compose.ui.semantics.Role
-import org.w3c.dom.Text
-
 
 data class Icon(
     val id: UInt,

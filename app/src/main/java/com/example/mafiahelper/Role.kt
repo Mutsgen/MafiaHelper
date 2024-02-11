@@ -11,8 +11,10 @@ class Role(private val context: Context, roleDTO: RoleDTO) {
     var team: Short
     var actFrequency: Short
     var icon: Int?
+
     var isDoKill: Boolean
     var isDoSave: Boolean
+
     var code: String?
     init {
         id = roleDTO.id
@@ -29,9 +31,12 @@ class Role(private val context: Context, roleDTO: RoleDTO) {
     }
 
     // Метод для выполнения действия роли
-    fun performAction(target: Player): String {
+    fun performAction(target: Player) {
         // Здесь можно добавить логику в зависимости от роли
-        return "Action performed on $target"
+         when {
+            isDoKill -> target.doDie()
+            isDoSave -> target.doSave()
+        }
     }
 
     // Метод для проверки, может ли роль выполнять действие
