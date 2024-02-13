@@ -88,12 +88,15 @@ class MainActivity : ComponentActivity() {
                 composable("loadingScreen") {
                     LoadingScreen(navController)
                 }
-                composable("otherScreen") {
+                composable("letsStartScreen") {
                     // IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
                     LetsStartScreen(navController)
                 }
                 composable("gameScreen") {
                     GameScreen(navController)
+                }
+                composable("preGameScreen") {
+                    PreGameScreen()
                 }
             }
         }
@@ -117,7 +120,7 @@ fun LetsStartScreen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("gameScreen") }) {
+            Button(onClick = { navController.navigate("preGameScreen") }) {
                 Text(text = "Начать игру")
             }
         }
@@ -151,7 +154,7 @@ fun LoadingScreen(navController: NavHostController) {
 
     LaunchedEffect(key1 = Unit) {
         if (isDatabaseReady(context)) {
-            navController.navigate("otherScreen")
+            navController.navigate("letsStartScreen")
         }
     }
 }
@@ -159,15 +162,18 @@ fun LoadingScreen(navController: NavHostController) {
 @Composable
 fun PreGameScreen() {
     var players = mutableListOf<Player>()
-    Column(modifier = Modifier.fillMaxSize()) {
+    val context = LocalContext.current
+    Column(modifier = Modifier.fillMaxSize().background(color = Color(ContextCompat.getColor(context, R.color.main_blue_white)))) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(20.dp),
+                .height(60.dp).background(color = Color(ContextCompat.getColor(context, R.color.secondary_red))),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Maff Helper")
+            Text(text = "Maff Helper", style = TextStyle(fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif), modifier = Modifier.offset(0.dp, 5.dp))
         }
+
+        Spacer(modifier = Modifier.height(30.dp))
 
         Row(
             modifier = Modifier
@@ -177,41 +183,48 @@ fun PreGameScreen() {
         ) {
             Button(
                 modifier = Modifier
-                    .height(20.dp)
+                    .height(60.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+                onClick = { /*TODO*/ },
+            ) {
+                Text(text = "+ игрок", fontSize = 20.sp)
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Button(
+                modifier = Modifier
+                    .height(60.dp)
                     .weight(1f)
                     .border(1.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
                 onClick = { /*TODO*/ }
             ) {
-                Text(text = "+ игрок")
+                Text(text = "Раздать роли", fontSize = 20.sp)
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Button(
                 modifier = Modifier
-                    .height(20.dp)
+                    .height(60.dp)
                     .weight(1f)
-                    .border(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
-                onClick = { /*TODO*/ }
-            ) {
-                Text(text = "Раздать роли")
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(
-                modifier = Modifier
-                    .height(20.dp)
-                    .weight(1f)
-                    .border(1.dp, Color.Black),
+                    .border(4.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green),
                 onClick = { /*TODO*/ }
             ) {
-                Text(text = "начать игру")
+                Text(text = "Начать игру", fontSize = 20.sp)
             }
         }
+
+        Spacer(modifier = Modifier.height(50.dp))
+
+//        Box(modifier = Modifier
+//            .fillMaxWidth()) {
+//            TimerComponent()
+//        }
     }
 }
 @Composable
@@ -221,25 +234,29 @@ fun GameScreen(navController: NavHostController) {
 
 @Composable
 fun TimerComponent() {
+    val context = LocalContext.current
     var timeLeft by remember { mutableStateOf(600_000L) } // 10 minutes in milliseconds
     var timerState by remember { mutableStateOf(TimerState.Stopped) }
     val timer = rememberCoroutineScope()
 
-    Column {
-        Text(
-            text = "${timeLeft / 60_000}:${(timeLeft % 60_000) / 1000}",
-            fontSize = 30.sp,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+    Column {Modifier.height(400.dp).fillMaxWidth()
 
-        Row(horizontalArrangement = Arrangement.SpaceEvenly) {
-            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
-            Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }) { Text("+1мин") }
-            Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }) { Text("-10сек") }
-            Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }) { Text("-1мин") }
+            Box(modifier = Modifier.height(120.dp).fillMaxWidth().border(2.dp, Color(ContextCompat.getColor(context, R.color.main_blue_white)))) {
+                Text(
+                    text = "${String.format("%02d", timeLeft / 60_000)}:${String.format("%02d", (timeLeft % 60_000) / 1000)}",
+                    fontSize = 100.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+        Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
+                Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }) { Text("+1мин") }
+                Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }) { Text("-10сек") }
+                Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }) { Text("-1мин") }
         }
 
-        Row {
+        Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
             Button(onClick = {
                 if (timerState == TimerState.Running) {
                     timerState = TimerState.Paused
@@ -248,7 +265,7 @@ fun TimerComponent() {
                     timer.launch {
                         while (timeLeft > 0 && timerState == TimerState.Running) {
                             delay(1000)
-                            timeLeft -= 1000
+                            if (timerState == TimerState.Running) timeLeft -= 1000
                         }
                     }
                 }
