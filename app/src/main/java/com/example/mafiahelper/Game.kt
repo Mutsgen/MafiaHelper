@@ -20,7 +20,7 @@ class Game(players: List<Player>) {
         setDon()
     }
 
-    fun swapStage() {
+    private fun swapStage() {
         currentStage = when (currentStage) {
             Stages.DAY -> Stages.NIGHT
             Stages.NIGHT -> {
@@ -40,6 +40,7 @@ class Game(players: List<Player>) {
             Stages.NIGHT -> performNightActions()
             Stages.DAY -> performDayActions()
         }
+        swapStage()
     }
 
     private fun performNightActions() {

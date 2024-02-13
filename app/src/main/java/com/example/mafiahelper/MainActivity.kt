@@ -3,20 +3,30 @@ package com.example.mafiahelper
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,31 +51,79 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+enum class TimerState {
+    Stopped, Running, Paused
+}
+
 class MainActivity : ComponentActivity() {
+    private var backPressedOnce = false
+    private var lastBackPressedTime = 0L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+            dispatcher?.addCallback(this) {
+                if (navController.currentDestination?.route == "gameScreen") {
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastBackPressedTime < 2000) {
+                        finish() // Закрыть приложение при двойном нажатии в течение 2 секунд
+                    } else {
+                        lastBackPressedTime = currentTime
+                        Toast.makeText(applicationContext, "Нажмите еще раз, чтобы закрыть приложение", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    this.remove() // Удалите этот колбек
+                    navController.popBackStack() // Вызовите стандартное поведение кнопки "Назад"
+                }
+            }
 
             NavHost(navController = navController, startDestination = "loadingScreen") {
                 composable("loadingScreen") {
                     LoadingScreen(navController)
                 }
                 composable("otherScreen") {
-                     IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
-//                    OtherScreen()
+                    // IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
+                    LetsStartScreen(navController)
                 }
+                composable("gameScreen") {
+                    GameScreen(navController)
+                }
+            }
+        }
+    }
+
+}
+@SuppressLint("ResourceAsColor")
+@Composable
+fun LetsStartScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color(ContextCompat.getColor(context, R.color.main_blue_white))),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Maff Helper",
+                style = TextStyle(fontSize = 42.sp, color = Color.Black, fontFamily = FontFamily.SansSerif)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(onClick = { navController.navigate("gameScreen") }) {
+                Text(text = "Начать игру")
             }
         }
     }
 }
 
-@Composable
-fun OtherScreen() {
-    Text(text = "Maff Helper")
-}
 
 
 
@@ -96,6 +155,117 @@ fun LoadingScreen(navController: NavHostController) {
         }
     }
 }
+
+@Composable
+fun PreGameScreen() {
+    var players = mutableListOf<Player>()
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "Maff Helper")
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                modifier = Modifier
+                    .height(20.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = "+ игрок")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                modifier = Modifier
+                    .height(20.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = "Раздать роли")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                modifier = Modifier
+                    .height(20.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green),
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = "начать игру")
+            }
+        }
+    }
+}
+@Composable
+fun GameScreen(navController: NavHostController) {
+    // ваш код здесь
+}
+
+@Composable
+fun TimerComponent() {
+    var timeLeft by remember { mutableStateOf(600_000L) } // 10 minutes in milliseconds
+    var timerState by remember { mutableStateOf(TimerState.Stopped) }
+    val timer = rememberCoroutineScope()
+
+    Column {
+        Text(
+            text = "${timeLeft / 60_000}:${(timeLeft % 60_000) / 1000}",
+            fontSize = 30.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
+            Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }) { Text("+1мин") }
+            Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }) { Text("-10сек") }
+            Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }) { Text("-1мин") }
+        }
+
+        Row {
+            Button(onClick = {
+                if (timerState == TimerState.Running) {
+                    timerState = TimerState.Paused
+                } else {
+                    timerState = TimerState.Running
+                    timer.launch {
+                        while (timeLeft > 0 && timerState == TimerState.Running) {
+                            delay(1000)
+                            timeLeft -= 1000
+                        }
+                    }
+                }
+            }) {
+                Text(if (timerState == TimerState.Running) "Остановить" else "Запустить")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(onClick = {
+                timerState = TimerState.Stopped
+                timeLeft = 600_000
+            }) { Text("Сбросить") }
+        }
+    }
+}
+
+
 
 
 
