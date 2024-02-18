@@ -154,15 +154,15 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon,isDoKill, isDoSave, code)
     }
 
-    fun getBaseRoles(): List<RoleDTO>? {
+    fun getBaseRoles(context: Context): List<Role>? {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT roles.*, icons.code FROM roles, icons where isBaseRole = 1 and icons.id = roles.icon", null)
-        val roles = mutableListOf<RoleDTO>()
+        val roles = mutableListOf<Role>()
 
         try {
             if (cursor.moveToFirst()) {
                 do {
-                    roles.add(cursorToRoleDTO(cursor))
+                    roles.add(Role(context, cursorToRoleDTO(cursor)))
                 } while (cursor.moveToNext())
             }
         } catch (e: Exception) {

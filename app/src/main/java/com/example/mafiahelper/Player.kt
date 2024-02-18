@@ -5,7 +5,7 @@ import android.annotation.SuppressLint
 
 class Player(number: UInt, name: String?, role: Role) {
     val _number = number
-    val _name = name
+    var _name = name
     var _isAlive: Boolean = true
     var _role: Role
     var _isSaveCurrentNight = false
@@ -14,6 +14,12 @@ class Player(number: UInt, name: String?, role: Role) {
 
     init {
         _role = role
+    }
+
+    fun updatePlayer(name: String?, role: Role): Player {
+        _name = name
+        _role = role
+        return this
     }
 
     fun doAction(target: Player) {
