@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,8 +25,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
@@ -244,7 +247,7 @@ fun PreGameScreen() {
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
                 onClick = {
                     if (players.value.size < 12) players.value =
-                        players.value + Player(players.value.size.toUInt() + 1u, "", roles!![0])
+                        players.value + Player(players.value[players.value.size - 1]._number + 1u, "", roles!![0])
                 }) {
                 Text(text = "+ игрок", fontSize = 20.sp)
             }
@@ -256,21 +259,23 @@ fun PreGameScreen() {
                 .weight(1f)
                 .border(1.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
-                onClick =  {
-                    val whiteRoles = roles!!.filter { it.team == 0.toShort() && it.id != 1u }.toMutableList()
+                onClick = {
+                    val whiteRoles =
+                        roles!!.filter { it.team == 0.toShort() && it.id != 1u }.toMutableList()
                     val redRoles = roles.filter { it.team == 1.toShort() }
 
                     val updatedPlayers = players.value.toMutableList()
                     updatedPlayers.forEach { player -> player.updatePlayer(player._name, roles[0]) }
                     var whiteCount = whiteRoles.size
-                    var redCount =  floor(updatedPlayers.size / 4f).toInt()
+                    var redCount = floor(updatedPlayers.size / 4f).toInt()
 
                     println(whiteCount)
                     println(redCount)
 
                     while (players.value.size >= 4 && (whiteCount > 0 || redCount > 0)) {
                         val playerIndex =
-                            updatedPlayers.indices.filter { updatedPlayers[it]._role.id == 1u }.random()
+                            updatedPlayers.indices.filter { updatedPlayers[it]._role.id == 1u }
+                                .random()
                         if (whiteRoles.size > 0) {
                             --whiteCount
                             updatedPlayers[playerIndex].updatePlayer(
@@ -278,8 +283,7 @@ fun PreGameScreen() {
                                 whiteRoles.removeAt(0)
                             )
                             continue
-                        }
-                        else if (redRoles.isNotEmpty()) {
+                        } else if (redRoles.isNotEmpty()) {
                             --redCount
                             updatedPlayers[playerIndex].updatePlayer(
                                 updatedPlayers[playerIndex]._name,
@@ -292,7 +296,7 @@ fun PreGameScreen() {
                     updatedPlayers.add(Player(players.value.size.toUInt() + 1u, "", roles[0]))
                     players.value = updatedPlayers
                     players.value = (players.value as MutableList<Player>).dropLast(1)
-                    players.apply {  }
+                    players.apply { }
 
                 }) {
                 Text(text = "Раздать роли", fontSize = 20.sp)
@@ -361,7 +365,37 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
     ) {
         Box(
             modifier = Modifier
-                .width(50.dp)
+                .width(40.dp)
+                .height(50.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            Button(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(35.dp)
+                    .padding(0.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray)),
+                    contentColor = Color.White // Adjust as needed
+                ),
+                shape = RoundedCornerShape(size = 5.dp), // Or another shape as per your design requirements
+                border = BorderStroke(0.dp, Color.Transparent), // This removes the border
+                onClick = { val playerList = players.value.toMutableList()
+                    playerList.remove(player)
+                    players.value = playerList }
+            ) {
+                Text(
+                    text = "X",
+                    fontSize = 15.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxSize()
+                        .wrapContentSize(Alignment.Center) // This centers the text within the button
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .width(40.dp)
                 .height(50.dp)
                 .align(Alignment.CenterVertically)
         ) {
@@ -423,13 +457,13 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
         )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             roles.forEach { role ->
-                    DropdownMenuItem(onClick = {
-                        selectedRole = role
-                        player._role = role
-                        expanded = false
-                    }) {
-                        Text(role.name)
-                    }
+                DropdownMenuItem(onClick = {
+                    selectedRole = role
+                    player._role = role
+                    expanded = false
+                }) {
+                    Text(role.name)
+                }
             }
         }
     }

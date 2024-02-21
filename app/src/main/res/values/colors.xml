@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="glassyBlack">#5C272727</color>
+    <color name="glassyGray">#5C5C5B5B</color>
     <color name="white">#FFFFFFFF</color>
     <color name="main_red">#BCEC3527</color>
     <color name="secondary_red">#2DCD8B86</color>
