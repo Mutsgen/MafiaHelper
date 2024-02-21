@@ -4,7 +4,7 @@ enum class Stages {
     NIGHT,
     DAY
 }
-class Game(players: List<Player>) {
+class Game(players: List<Player> = listOf()) {
     var currentDay = 1
     var currentStage: Stages = Stages.DAY
     private val teamCounts = mutableMapOf<Short, Int>()

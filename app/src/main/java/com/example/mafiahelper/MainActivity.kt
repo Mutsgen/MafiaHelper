@@ -40,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,6 +74,7 @@ enum class TimerState {
 }
 
 class MainActivity : ComponentActivity() {
+    var game: MutableState<Game?> = mutableStateOf(null)
     private var backPressedOnce = false
     private var lastBackPressedTime = 0L
 
@@ -82,7 +84,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-            dispatcher?.addCallback(this) {
+            dispatcher!!.addCallback(this) {
                 if (navController.currentDestination?.route == "preGameScreen") {
                     val currentTime = System.currentTimeMillis()
                     if (currentTime - lastBackPressedTime < 2000) {
@@ -109,13 +111,14 @@ class MainActivity : ComponentActivity() {
                     // IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
                     LetsStartScreen(navController)
                 }
-                composable("gameScreen") {
-                    GameScreen(navController)
-                }
                 composable("preGameScreen") {
-                    PreGameScreen()
+                    PreGameScreen(navController, game)
+                }
+                composable("gameScreen") {
+                    GameScreen(navController, game)
                 }
             }
+
         }
     }
 
@@ -184,8 +187,9 @@ fun LoadingScreen(navController: NavHostController) {
 }
 
 @Composable
-fun PreGameScreen() {
+fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
     val context = LocalContext.current
+
 
     /**
      * 0 - мирный
@@ -309,7 +313,10 @@ fun PreGameScreen() {
                 .weight(1f)
                 .border(3.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green),
-                onClick = { /*TODO*/ }) {
+                onClick = {
+                    game.value = Game(players.value)
+                    navController.navigate("gameScreen")
+                }) {
                 Text(text = "Начать игру", fontSize = 20.sp)
             }
         }
@@ -388,7 +395,8 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     text = "X",
                     fontSize = 15.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
                         .wrapContentSize(Alignment.Center) // This centers the text within the button
                 )
             }
@@ -470,14 +478,14 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
 }
 
 @Composable
-fun GameScreen(navController: NavHostController) {
-    // ваш код здесь
+fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
+    Text(text = game.value.toString())
 }
 
 @Composable
 fun TimerComponent() {
     val context = LocalContext.current
-    var timeLeft by remember { mutableStateOf(600_000L) } // 10 minutes in milliseconds
+    var timeLeft by remember { mutableLongStateOf(600_000L) } // 10 minutes in milliseconds
     var timerState by remember { mutableStateOf(TimerState.Stopped) }
     val timer = rememberCoroutineScope()
 
