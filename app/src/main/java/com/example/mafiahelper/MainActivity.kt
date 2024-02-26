@@ -142,8 +142,10 @@ fun LetsStartScreen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("preGameScreen") }) {
-                Text(text = "Начать игру")
+            Button(onClick = { navController.navigate("preGameScreen") }, modifier = Modifier.width(100.dp).height(32.dp)) {
+                Text(text = "Начать игру", style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ))
             }
         }
     }
@@ -253,7 +255,9 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     if (players.value.size < 12) players.value =
                         players.value + Player(players.value[players.value.size - 1]._number + 1u, "", roles!![0])
                 }) {
-                Text(text = "+ игрок", fontSize = 20.sp)
+                Text(text = "+ игрок", style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ))
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -303,7 +307,9 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     players.apply { }
 
                 }) {
-                Text(text = "Раздать роли", fontSize = 20.sp)
+                Text(text = "Раздать роли", style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ))
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -312,12 +318,18 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .height(60.dp)
                 .weight(1f)
                 .border(3.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Green),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )),
                 onClick = {
                     game.value = Game(players.value)
                     navController.navigate("gameScreen")
                 }) {
-                Text(text = "Начать игру", fontSize = 20.sp)
+                Text(text = "Начать игру", style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ))
             }
         }
 
@@ -393,7 +405,9 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
             ) {
                 Text(
                     text = "X",
-                    fontSize = 15.sp,
+                    style = TextStyle(
+                        fontSize = 15.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    ),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
@@ -408,7 +422,9 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                text = player._number.toString(), fontSize = 30.sp, modifier = Modifier.align(
+                text = player._number.toString(), style = TextStyle(
+                    fontSize = 30.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.align(
                     Alignment.Center
                 )
             )
@@ -426,7 +442,9 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     updatePlayer(index, players, newName, role)
                 },
                 singleLine = true,
-                placeholder = { Text("Введите имя") })
+                placeholder = { Text("Введите имя", style = TextStyle(
+                    fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                )) })
         }
         Box(
             modifier = Modifier
@@ -460,7 +478,9 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .fillMaxHeight(.7f),
-            fontSize = 22.sp,
+            style = TextStyle(
+                fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+            ),
             textAlign = TextAlign.Center,
         )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -470,7 +490,9 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                     player._role = role
                     expanded = false
                 }) {
-                    Text(role.name)
+                    Text(role.name, style = TextStyle(
+                        fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    ))
                 }
             }
         }
@@ -505,7 +527,9 @@ fun TimerComponent() {
                     String.format(
                         "%02d", (timeLeft % 60_000) / 1000
                     )
-                }", fontSize = 100.sp, modifier = Modifier.align(Alignment.Center)
+                }", style = TextStyle(
+                    fontSize = 100.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.align(Alignment.Center)
             )
         }
 
