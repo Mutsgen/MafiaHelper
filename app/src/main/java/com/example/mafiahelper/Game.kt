@@ -4,8 +4,9 @@ enum class Stages {
     NIGHT,
     DAY
 }
+
 class Game(players: List<Player> = listOf()) {
-    var currentDay = 1
+    var currentDay: Int = 1
     var currentStage: Stages = Stages.DAY
     private val teamCounts = mutableMapOf<Short, Int>()
     var nowDon: Player? = null
@@ -43,19 +44,35 @@ class Game(players: List<Player> = listOf()) {
         swapStage()
     }
 
-    private fun performNightActions() {
-        nowDon?.let { don ->
-            if (don._role.actFrequency % currentDay == 0) {
-                don.doAction(don.target!!)
+    private fun performNightActions(): Int {
+        return try {
+            nowDon?.let { don ->
+                if (don._role.actFrequency % currentDay == 0) {
+                    don.doAction(don.target!!, currentDay, currentStage)
+                }
             }
+            _players.filter { it._role.name != "Мафия" && it._role.actFrequency % currentDay == 0 }
+                .forEach { it.doAction(it.target!!,  currentDay, currentStage) }
+            1
+        } catch (error: Exception) {
+            0
         }
-        _players.filter { it._role.name != "Мафия" && it._role.actFrequency % currentDay == 0 }
-            .forEach { it.doAction(it.target!!) }
     }
 
     private fun performDayActions() {
         nowVoteTarget?.let { it._isAlive = false }
         nowVoteTarget = null
+    }
+
+    fun returnNowActions() {
+        val actions = mutableListOf<Player>()
+        if (nowDon != null) actions.add(nowDon!!)
+        else {
+            setDon()
+            if (nowDon != null) actions.add(nowDon!!)
+        }
+        _players.filter { it._role.name != "Мафия" && it._isAlive }
+            .forEach { it._role.actFrequency}
     }
 
 

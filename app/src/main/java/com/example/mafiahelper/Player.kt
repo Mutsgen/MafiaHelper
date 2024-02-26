@@ -22,11 +22,11 @@ class Player(number: UInt, name: String?, role: Role) {
         return this
     }
 
-    fun doAction(target: Player) {
+    fun doAction(target: Player, day: Int, stage: Stages) {
         if (this._isAlive
             && !this._isDisabledCurrentDay
             && target._isAlive
-            && this._role.canPerformAction()) {
+            && this._role.canPerformAction(day, stage)) {
             this._role.performAction(target)
         }
     }
@@ -48,11 +48,11 @@ class Player(number: UInt, name: String?, role: Role) {
     }
 
     @SuppressLint("SuspiciousIndentation")
-    fun selectTarget(targetPlayer: Player) {
+    fun selectTarget(targetPlayer: Player, day: Int, stage: Stages) {
         if (this._isAlive
             && !this._isDisabledCurrentDay
             && targetPlayer._isAlive
-            && this._role.canPerformAction())
+            && this._role.canPerformAction(day, stage))
         target = targetPlayer
     }
 
