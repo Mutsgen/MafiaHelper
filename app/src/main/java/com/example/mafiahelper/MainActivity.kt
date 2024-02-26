@@ -142,9 +142,11 @@ fun LetsStartScreen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("preGameScreen") }, modifier = Modifier.width(100.dp).height(32.dp)) {
+            Button(onClick = { navController.navigate("preGameScreen") }, modifier = Modifier
+                .width(200.dp)
+                .height(45.dp)) {
                 Text(text = "Начать игру", style = TextStyle(
-                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    fontSize = 20.sp, color = Color.White, fontFamily = FontFamily.SansSerif
                 ))
             }
         }
@@ -191,6 +193,8 @@ fun LoadingScreen(navController: NavHostController) {
 @Composable
 fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
     val context = LocalContext.current
+
+    val icons: List<Icon> = getAllIconsFromDb(context)
 
 
     /**
@@ -341,7 +345,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .background(color = Color(ContextCompat.getColor(context, R.color.main_blue_white)))
         ) {
             if (roles != null) {
-                PlayerTable(players, roles)
+                PlayerTable(players, roles, icons)
             }
         }
     }
@@ -349,7 +353,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
 }
 
 @Composable
-fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>) {
+fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>, icons: List<Icon>) {
     val context = LocalContext.current
     LazyColumn(
         Modifier
@@ -363,13 +367,13 @@ fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>) {
             .border(1.dp, Color.Black)
     ) {
         items(players.value.size) { index ->
-            PlayerRow(players.value[index], index, roles, players)
+            PlayerRow(players.value[index], index, roles, players, icons)
         }
     }
 }
 
 @Composable
-fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableState<List<Player>>) {
+fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableState<List<Player>>, icons: List<Icon>) {
     val context = LocalContext.current
     var name by remember { mutableStateOf(player._name) }
     var role by remember { mutableStateOf(player._role) }
@@ -451,13 +455,13 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 .width(150.dp)
                 .height(50.dp)
         ) {
-            RoleSelector(player, roles, players)
+            RoleSelector(player, roles, players, icons)
         }
     }
 }
 
 @Composable
-fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<Player>>) {
+fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<Player>>, icons: List<Icon>) {
     var selectedRole by remember { mutableStateOf(player._role) }
 
     LaunchedEffect(player._role) {
@@ -470,9 +474,9 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
             .fillMaxHeight()
     ) {
         var expanded by remember { mutableStateOf(false) }
-
+        val selectedIcon = icons.find { it.id == (selectedRole.icon?.toUInt() ?: -1) }
         Text(
-            selectedRole.name,
+            "${selectedIcon?.code ?: ""} ${selectedRole.name}",
             Modifier
                 .clickable { expanded = true }
                 .align(Alignment.Center)
@@ -490,7 +494,8 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                     player._role = role
                     expanded = false
                 }) {
-                    Text(role.name, style = TextStyle(
+                    val icon = icons.find { it.id == (role.icon?.toUInt() ?: -1) }
+                    Text("${icon?.code ?: ""} ${role.name}", style = TextStyle(
                         fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                     ))
                 }
