@@ -194,9 +194,6 @@ fun LoadingScreen(navController: NavHostController) {
 fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
     val context = LocalContext.current
 
-    val icons: List<Icon> = getAllIconsFromDb(context)
-
-
     /**
      * 0 - мирный
      * 1 - мафия
@@ -345,7 +342,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .background(color = Color(ContextCompat.getColor(context, R.color.main_blue_white)))
         ) {
             if (roles != null) {
-                PlayerTable(players, roles, icons)
+                PlayerTable(players, roles)
             }
         }
     }
@@ -353,7 +350,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
 }
 
 @Composable
-fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>, icons: List<Icon>) {
+fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>) {
     val context = LocalContext.current
     LazyColumn(
         Modifier
@@ -367,13 +364,13 @@ fun PlayerTable(players: MutableState<List<Player>>, roles: List<Role>, icons: L
             .border(1.dp, Color.Black)
     ) {
         items(players.value.size) { index ->
-            PlayerRow(players.value[index], index, roles, players, icons)
+            PlayerRow(players.value[index], index, roles, players)
         }
     }
 }
 
 @Composable
-fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableState<List<Player>>, icons: List<Icon>) {
+fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableState<List<Player>>) {
     val context = LocalContext.current
     var name by remember { mutableStateOf(player._name) }
     var role by remember { mutableStateOf(player._role) }
@@ -455,13 +452,13 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 .width(150.dp)
                 .height(50.dp)
         ) {
-            RoleSelector(player, roles, players, icons)
+            RoleSelector(player, roles, players)
         }
     }
 }
 
 @Composable
-fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<Player>>, icons: List<Icon>) {
+fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<Player>>) {
     var selectedRole by remember { mutableStateOf(player._role) }
 
     LaunchedEffect(player._role) {
@@ -474,9 +471,8 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
             .fillMaxHeight()
     ) {
         var expanded by remember { mutableStateOf(false) }
-        val selectedIcon = icons.find { it.id == (selectedRole.icon?.toUInt() ?: -1) }
         Text(
-            "${selectedIcon?.code ?: ""} ${selectedRole.name}",
+            "${selectedRole.code ?: ""} ${selectedRole.name}",
             Modifier
                 .clickable { expanded = true }
                 .align(Alignment.Center)
@@ -494,8 +490,7 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                     player._role = role
                     expanded = false
                 }) {
-                    val icon = icons.find { it.id == (role.icon?.toUInt() ?: -1) }
-                    Text("${icon?.code ?: ""} ${role.name}", style = TextStyle(
+                    Text("${role.code ?: ""} ${role.name}", style = TextStyle(
                         fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                     ))
                 }
@@ -506,6 +501,7 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
 
 @Composable
 fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
+    val context = LocalContext.current
     Text(text = game.value.toString())
 }
 
