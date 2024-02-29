@@ -48,11 +48,11 @@ class Game(players: List<Player> = listOf()) {
         return try {
             nowDon?.let { don ->
                 if (don._role.actFrequency % currentDay == 0) {
-                    don.doAction(don.target!!, currentDay, currentStage)
+                    don.doAction(don._target!!, currentDay, currentStage)
                 }
             }
-            _players.filter { it._role.name != "Мафия" && it._role.actFrequency % currentDay == 0 }
-                .forEach { it.doAction(it.target!!,  currentDay, currentStage) }
+            _players.filter { it._role.name != "Мафия" }
+                .forEach { it.doAction(it._target!!,  currentDay, currentStage) }
             1
         } catch (error: Exception) {
             0
@@ -71,8 +71,8 @@ class Game(players: List<Player> = listOf()) {
             setDon()
             if (nowDon != null) actions.add(nowDon!!)
         }
-        _players.filter { it._role.name != "Мафия" && it._isAlive }
-            .forEach { it._role.actFrequency}
+        _players.filter { it._role.name != "Мафия" && it._isAlive && it._role.canPerformAction(currentDay, currentStage) }
+            .forEach { actions.add(it) }
     }
 
 

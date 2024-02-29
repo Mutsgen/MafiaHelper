@@ -41,6 +41,6 @@ class Role(private val context: Context, roleDTO: RoleDTO) {
 
     // Метод для проверки, может ли роль выполнять действие
     fun canPerformAction(day: Int, stage: Stages): Boolean {
-        return day % this.actFrequency  == 0 && stage == Stages.NIGHT && this.isDoNight
+        return day % this.actFrequency  == 0 && (stage == Stages.NIGHT && this.isDoNight)
     }
 }

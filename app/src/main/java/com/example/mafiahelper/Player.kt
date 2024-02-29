@@ -10,7 +10,7 @@ class Player(number: UInt, name: String?, role: Role) {
     var _role: Role
     var _isSaveCurrentNight = false
     var _isDisabledCurrentDay = false
-    var target: Player? = null
+    var _target: Player? = null
 
     init {
         _role = role
@@ -44,7 +44,7 @@ class Player(number: UInt, name: String?, role: Role) {
     fun dropNightModifiers() {
         _isSaveCurrentNight = false
         _isDisabledCurrentDay = false
-        target = null
+        _target = null
     }
 
     @SuppressLint("SuspiciousIndentation")
@@ -53,7 +53,7 @@ class Player(number: UInt, name: String?, role: Role) {
             && !this._isDisabledCurrentDay
             && targetPlayer._isAlive
             && this._role.canPerformAction(day, stage))
-        target = targetPlayer
+        _target = targetPlayer
     }
 
 }
