@@ -71,8 +71,9 @@ class Game(players: List<Player> = listOf()) {
             setDon()
             if (nowDon != null) actions.add(nowDon!!)
         }
-        _players.filter { it._role.name != "Мафия" && it._isAlive && it._role.canPerformAction(currentDay, currentStage) }
-            .forEach { actions.add(it) }
+        _players.filter { it._role.name != "Мафия" && it._isAlive &&
+                it._role.canPerformAction(currentDay, currentStage) }
+            .forEach {  actions.add(it) }
     }
 
 

@@ -22,6 +22,7 @@ data class RoleDTO(
     val icon: Int?,
     val isDoKill: Boolean,
     val isDoSave: Boolean,
+    /* TODO: реализовать шерифа сканирование*/
     val code: String?
 )
 

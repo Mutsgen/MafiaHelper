@@ -275,11 +275,9 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
 
                     val updatedPlayers = players.value.toMutableList()
                     updatedPlayers.forEach { player -> player.updatePlayer(player._name, roles[0]) }
+
                     var whiteCount = whiteRoles.size
                     var redCount = floor(updatedPlayers.size / 4f).toInt()
-
-                    println(whiteCount)
-                    println(redCount)
 
                     while (players.value.size >= 4 && (whiteCount > 0 || redCount > 0)) {
                         val playerIndex =
@@ -305,8 +303,6 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     updatedPlayers.add(Player(players.value.size.toUInt() + 1u, "", roles[0]))
                     players.value = updatedPlayers
                     players.value = (players.value as MutableList<Player>).dropLast(1)
-                    players.apply { }
-
                 }) {
                 Text(text = "Раздать роли", style = TextStyle(
                     fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
@@ -644,6 +640,11 @@ fun updatePlayer(index: Int, players: MutableState<List<Player>>, name: String, 
     }
 }
 
+//suspend для лучшей работы с корутиной и контекстами
+/*
+ * так как вызывается только она в корутине
+ * то только эта функция обернута в такую особенность
+ */
 suspend fun isDatabaseReady(context: Context): Boolean {
     val db = DbHelper(context = context, factory = null)
     return withContext(context = Dispatchers.IO) { db.checkAndResetDataBase() }

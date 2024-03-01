@@ -3,19 +3,18 @@ package com.example.mafiahelper
 import android.content.Context
 
 class Role(private val context: Context, roleDTO: RoleDTO) {
-    var id: UInt
-    var name: String
-    var isBaseRole: Boolean
-    var isDoNight: Boolean
-    var isCanDie: Boolean
-    var team: Short
-    var actFrequency: Short
-    var icon: Int?
-
-    var isDoKill: Boolean
-    var isDoSave: Boolean
-
-    var code: String?
+    val id: UInt
+    val name: String
+    val isBaseRole: Boolean
+    val isDoNight: Boolean
+    val isCanDie: Boolean
+    val team: Short
+    val actFrequency: Short
+    val icon: Int?
+    val isDoKill: Boolean
+    val isDoSave: Boolean
+    /* TODO: реализовать шерифа сканирование*/
+    val code: String?
     init {
         id = roleDTO.id
         name = roleDTO.name
