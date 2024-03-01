@@ -498,7 +498,32 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
 @Composable
 fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
     val context = LocalContext.current
-    Text(text = game.value.toString())
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color(ContextCompat.getColor(context, R.color.main_blue_white))),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(
+                    color = Color(
+                        ContextCompat.getColor(
+                            context, R.color.secondary_red
+                        )
+                    )
+                ), contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Maff Helper", style = TextStyle(
+                    fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.offset(0.dp, 5.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(30.dp))
+    }
 }
 
 @Composable
