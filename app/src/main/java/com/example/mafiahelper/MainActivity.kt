@@ -63,6 +63,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -143,13 +144,20 @@ fun LetsStartScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(20.dp))
             Button(
-                onClick = { navController.navigate("preGameScreen") }, modifier = Modifier
+                onClick = { navController.navigate("preGameScreen") },
+                modifier = Modifier
                     .width(200.dp)
-                    .height(45.dp)
+                    .height(45.dp), colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
+                    )
+                )
             ) {
                 Text(
                     text = "Начать игру", style = TextStyle(
-                        fontSize = 20.sp, color = Color.White, fontFamily = FontFamily.SansSerif
+                        fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                     )
                 )
             }
@@ -257,12 +265,9 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .border(1.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
                 onClick = {
-                    if (players.value.size < 12) players.value =
-                        players.value + Player(
-                            players.value[players.value.size - 1]._number + 1u,
-                            "",
-                            roles!![0]
-                        )
+                    if (players.value.size < 12) players.value = players.value + Player(
+                        players.value[players.value.size - 1]._number + 1u, "", roles!![0]
+                    )
                 }) {
                 Text(
                     text = "+ игрок", style = TextStyle(
@@ -296,15 +301,13 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                         if (whiteRoles.size > 0) {
                             --whiteCount
                             updatedPlayers[playerIndex].updatePlayer(
-                                updatedPlayers[playerIndex]._name,
-                                whiteRoles.removeAt(0)
+                                updatedPlayers[playerIndex]._name, whiteRoles.removeAt(0)
                             )
                             continue
                         } else if (redRoles.isNotEmpty()) {
                             --redCount
                             updatedPlayers[playerIndex].updatePlayer(
-                                updatedPlayers[playerIndex]._name,
-                                redRoles.random()
+                                updatedPlayers[playerIndex]._name, redRoles.random()
                             )
                             continue
                         }
@@ -401,11 +404,10 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 .height(50.dp)
                 .align(Alignment.CenterVertically)
         ) {
-            Button(
-                modifier = Modifier
-                    .height(50.dp)
-                    .width(35.dp)
-                    .padding(0.dp),
+            Button(modifier = Modifier
+                .height(50.dp)
+                .width(35.dp)
+                .padding(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray)),
                     contentColor = Color.White // Adjust as needed
@@ -416,8 +418,7 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     val playerList = players.value.toMutableList()
                     playerList.remove(player)
                     players.value = playerList
-                }
-            ) {
+                }) {
                 Text(
                     text = "X",
                     style = TextStyle(
@@ -545,8 +546,8 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly) {
+                .height(50.dp), horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             Text(
                 text = "День: ${game.value!!.currentDay}", style = TextStyle(
                     fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
@@ -554,9 +555,11 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
             )
 
             Text(
-                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "ночь" else "день"}", style = TextStyle(
+                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "ночь" else "день"}",
+                style = TextStyle(
                     fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                ), modifier = Modifier.offset(0.dp, 5.dp)
+                ),
+                modifier = Modifier.offset(0.dp, 5.dp)
             )
         }
 
@@ -564,12 +567,27 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
 
         Spacer(Modifier.height(10.dp))
 
-        Row (
+        Row(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.1f), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Button(onClick = { /*TODO*/ }) {
-                    Text("Закрыть стадию")
+                .fillMaxHeight(.2f),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                modifier = Modifier.height(60.dp),
+                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
+                    )
+                )
+            ) {
+                Text(
+                    "Закрыть стадию", style = TextStyle(
+                        fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    )
+                )
             }
         }
 
@@ -602,8 +620,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp),
-        horizontalArrangement = Arrangement.Start
+            .height(50.dp), horizontalArrangement = Arrangement.Start
     ) {
         Box(
             modifier = Modifier
@@ -613,8 +630,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 .background(
                     color = Color(
                         ContextCompat.getColor(
-                            context,
-                            if (player._role.team == 0.toShort()) R.color.green_secondary
+                            context, if (player._role.team == 0.toShort()) R.color.green_secondary
                             else if (player._role.team == 1.toShort()) R.color.main_red_glassy
                             else R.color.white
                         )
@@ -626,8 +642,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                     if (player._name!!.length >= 8) player._name!!.slice(
                         IntRange(0, 5)
                     ) + "..." else player._name
-                }",
-                style = TextStyle(
+                }", style = TextStyle(
                     fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ), modifier = Modifier.align(
                     Alignment.Center
@@ -642,8 +657,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 .background(
                     color = Color(
                         ContextCompat.getColor(
-                            context,
-                            if (player._role.team == 0.toShort()) R.color.green_secondary
+                            context, if (player._role.team == 0.toShort()) R.color.green_secondary
                             else if (player._role.team == 1.toShort()) R.color.main_red_glassy
                             else R.color.white
                         )
@@ -651,9 +665,11 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 ),
         ) {
             Text(
-                text = "${player._role.code} ${if (!isLongNameBox) player._role.name else ""}", style = TextStyle(
+                text = "${player._role.code} ${if (!isLongNameBox) player._role.name else ""}",
+                style = TextStyle(
                     fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                ), modifier = Modifier.align(
+                ),
+                modifier = Modifier.align(
                     Alignment.Center
                 )
             )
@@ -668,6 +684,7 @@ fun TimerComponent() {
     var timeLeft by remember { mutableLongStateOf(60_000L) } // 1 minute in milliseconds
     var timerState by remember { mutableStateOf(TimerState.Stopped) }
     val timer = rememberCoroutineScope()
+    var timerJob by remember { mutableStateOf<Job?>(null) }
 
     Column {
         Modifier
@@ -696,11 +713,35 @@ fun TimerComponent() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }) { Text("+1мин") }
-            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
+            Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) { Text("+1мин") }
+            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) { Text("+10сек") }
 
-            Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }) { Text("-10сек") }
-            Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }) { Text("-1мин") }
+            Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) { Text("-10сек") }
+            Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) { Text("-1мин") }
         }
 
         Row(
@@ -711,16 +752,24 @@ fun TimerComponent() {
             Button(onClick = {
                 if (timerState == TimerState.Running) {
                     timerState = TimerState.Paused
+                    timerJob?.cancel()
                 } else {
                     timerState = TimerState.Running
-                    timer.launch {
+                    timerJob?.cancel()
+                    timerJob = timer.launch {
                         while (timeLeft > 0 && timerState == TimerState.Running) {
                             delay(1000)
                             if (timerState == TimerState.Running) timeLeft -= 1000
                         }
                     }
                 }
-            }) {
+            }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) {
                 Text(if (timerState == TimerState.Running) "Остановить" else "Запустить")
             }
             Spacer(modifier = Modifier.width(8.dp))
@@ -728,7 +777,13 @@ fun TimerComponent() {
             Button(onClick = {
                 timerState = TimerState.Stopped
                 timeLeft = 60_000L
-            }) { Text("Сбросить") }
+            }, colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.green_main
+                    )
+                )
+            )) { Text("Сбросить") }
         }
     }
 }
