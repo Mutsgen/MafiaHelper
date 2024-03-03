@@ -142,12 +142,16 @@ fun LetsStartScreen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("preGameScreen") }, modifier = Modifier
-                .width(200.dp)
-                .height(45.dp)) {
-                Text(text = "Начать игру", style = TextStyle(
-                    fontSize = 20.sp, color = Color.White, fontFamily = FontFamily.SansSerif
-                ))
+            Button(
+                onClick = { navController.navigate("preGameScreen") }, modifier = Modifier
+                    .width(200.dp)
+                    .height(45.dp)
+            ) {
+                Text(
+                    text = "Начать игру", style = TextStyle(
+                        fontSize = 20.sp, color = Color.White, fontFamily = FontFamily.SansSerif
+                    )
+                )
             }
         }
     }
@@ -254,11 +258,17 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
                 onClick = {
                     if (players.value.size < 12) players.value =
-                        players.value + Player(players.value[players.value.size - 1]._number + 1u, "", roles!![0])
+                        players.value + Player(
+                            players.value[players.value.size - 1]._number + 1u,
+                            "",
+                            roles!![0]
+                        )
                 }) {
-                Text(text = "+ игрок", style = TextStyle(
-                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                ))
+                Text(
+                    text = "+ игрок", style = TextStyle(
+                        fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    )
+                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -304,9 +314,11 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     players.value = updatedPlayers
                     players.value = (players.value as MutableList<Player>).dropLast(1)
                 }) {
-                Text(text = "Раздать роли", style = TextStyle(
-                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                ))
+                Text(
+                    text = "Раздать роли", style = TextStyle(
+                        fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    )
+                )
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -315,18 +327,22 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .height(60.dp)
                 .weight(1f)
                 .border(3.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )),
+                ),
                 onClick = {
                     game.value = Game(players.value)
                     navController.navigate("gameScreen")
                 }) {
-                Text(text = "Начать игру", style = TextStyle(
-                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                ))
+                Text(
+                    text = "Начать игру", style = TextStyle(
+                        fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    )
+                )
             }
         }
 
@@ -396,9 +412,11 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 ),
                 shape = RoundedCornerShape(size = 5.dp), // Or another shape as per your design requirements
                 border = BorderStroke(0.dp, Color.Transparent), // This removes the border
-                onClick = { val playerList = players.value.toMutableList()
+                onClick = {
+                    val playerList = players.value.toMutableList()
                     playerList.remove(player)
-                    players.value = playerList }
+                    players.value = playerList
+                }
             ) {
                 Text(
                     text = "X",
@@ -439,9 +457,13 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     updatePlayer(index, players, newName, role)
                 },
                 singleLine = true,
-                placeholder = { Text("Введите имя", style = TextStyle(
-                    fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                )) })
+                placeholder = {
+                    Text(
+                        "Введите имя", style = TextStyle(
+                            fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                        )
+                    )
+                })
         }
         Box(
             modifier = Modifier
@@ -486,9 +508,11 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                     player._role = role
                     expanded = false
                 }) {
-                    Text("${role.code ?: ""} ${role.name}", style = TextStyle(
-                        fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                    ))
+                    Text(
+                        "${role.code ?: ""} ${role.name}", style = TextStyle(
+                            fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                        )
+                    )
                 }
             }
         }
@@ -496,8 +520,9 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
 }
 
 @Composable
-fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
+fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
     val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -506,14 +531,7 @@ fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
-                .background(
-                    color = Color(
-                        ContextCompat.getColor(
-                            context, R.color.secondary_red
-                        )
-                    )
-                ), contentAlignment = Alignment.Center
+                .height(60.dp), contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "Maff Helper", style = TextStyle(
@@ -522,20 +540,138 @@ fun GameScreen(navController: NavHostController, game:  MutableState<Game?>) {
             )
         }
 
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly) {
+            Text(
+                text = "День: ${game.value!!.currentDay}", style = TextStyle(
+                    fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.offset(0.dp, 5.dp)
+            )
+
+            Text(
+                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "ночь" else "день"}", style = TextStyle(
+                    fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.offset(0.dp, 5.dp)
+            )
+        }
+
+        GameTable(game)
+
+        Spacer(Modifier.height(10.dp))
+
+        Row (
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.1f), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Button(onClick = { /*TODO*/ }) {
+                    Text("Закрыть стадию")
+            }
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        TimerComponent()
     }
 }
 
 @Composable
+fun GameTable(game: MutableState<Game?>) {
+    val isLongNameBox = game.value!!._players.find { it._name!!.length >= 8 } != null
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(.5f)
+            .padding(5.dp)
+    ) {
+        game.value?._players?.let {
+            items(it.size) { index ->
+                GamePlayerRow(game, it[index], isLongNameBox)
+            }
+        }
+    }
+}
+
+@Composable
+fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Boolean) {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .width(if (isLongNameBox) 120.dp else 86.dp)
+                .height(60.dp)
+                .border(1.dp, Color.Black)
+                .background(
+                    color = Color(
+                        ContextCompat.getColor(
+                            context,
+                            if (player._role.team == 0.toShort()) R.color.green_secondary
+                            else if (player._role.team == 1.toShort()) R.color.main_red_glassy
+                            else R.color.white
+                        )
+                    )
+                ),
+        ) {
+            Text(
+                text = "${player._number} ${
+                    if (player._name!!.length >= 8) player._name!!.slice(
+                        IntRange(0, 5)
+                    ) + "..." else player._name
+                }",
+                style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
+        Box(
+            modifier = Modifier
+                .width(if (!isLongNameBox) 130.dp else 50.dp)
+                .height(60.dp)
+                .border(1.dp, Color.Black)
+                .background(
+                    color = Color(
+                        ContextCompat.getColor(
+                            context,
+                            if (player._role.team == 0.toShort()) R.color.green_secondary
+                            else if (player._role.team == 1.toShort()) R.color.main_red_glassy
+                            else R.color.white
+                        )
+                    )
+                ),
+        ) {
+            Text(
+                text = "${player._role.code} ${if (!isLongNameBox) player._role.name else ""}", style = TextStyle(
+                    fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                ), modifier = Modifier.align(
+                    Alignment.Center
+                )
+            )
+        }
+    }
+}
+
+
+@Composable
 fun TimerComponent() {
     val context = LocalContext.current
-    var timeLeft by remember { mutableLongStateOf(600_000L) } // 10 minutes in milliseconds
+    var timeLeft by remember { mutableLongStateOf(60_000L) } // 1 minute in milliseconds
     var timerState by remember { mutableStateOf(TimerState.Stopped) }
     val timer = rememberCoroutineScope()
 
     Column {
         Modifier
-            .height(400.dp)
+            .height(380.dp)
             .fillMaxWidth()
 
         Box(
@@ -550,7 +686,7 @@ fun TimerComponent() {
                         "%02d", (timeLeft % 60_000) / 1000
                     )
                 }", style = TextStyle(
-                    fontSize = 100.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                    fontSize = 80.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ), modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -560,8 +696,9 @@ fun TimerComponent() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
             Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }) { Text("+1мин") }
+            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }) { Text("+10сек") }
+
             Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }) { Text("-10сек") }
             Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }) { Text("-1мин") }
         }
@@ -590,7 +727,7 @@ fun TimerComponent() {
 
             Button(onClick = {
                 timerState = TimerState.Stopped
-                timeLeft = 600_000
+                timeLeft = 60_000L
             }) { Text("Сбросить") }
         }
     }
