@@ -16,6 +16,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,12 +30,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -73,6 +75,7 @@ import kotlin.math.floor
 enum class TimerState {
     Stopped, Running, Paused
 }
+
 
 class MainActivity : ComponentActivity() {
     var game: MutableState<Game?> = mutableStateOf(null)
@@ -145,6 +148,19 @@ fun LetsStartScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = { navController.navigate("preGameScreen") },
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
                 modifier = Modifier
                     .width(200.dp)
                     .height(45.dp), colors = ButtonDefaults.buttonColors(
@@ -239,7 +255,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .background(
                     color = Color(
                         ContextCompat.getColor(
-                            context, R.color.secondary_red
+                            context, R.color.main_blue_white
                         )
                     )
                 ), contentAlignment = Alignment.Center
@@ -259,16 +275,31 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(modifier = Modifier
-                .height(60.dp)
-                .weight(1f)
-                .border(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+            Button(
+                modifier = Modifier
+                    .height(60.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray))),
                 onClick = {
                     if (players.value.size < 12) players.value = players.value + Player(
                         players.value[players.value.size - 1]._number + 1u, "", roles!![0]
                     )
-                }) {
+                },
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                )
+            ) {
                 Text(
                     text = "+ игрок", style = TextStyle(
                         fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
@@ -278,11 +309,12 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Button(modifier = Modifier
-                .height(60.dp)
-                .weight(1f)
-                .border(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
+            Button(
+                modifier = Modifier
+                    .height(60.dp)
+                    .weight(1f)
+                    .border(1.dp, Color.Black),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray))),
                 onClick = {
                     val whiteRoles =
                         roles!!.filter { it.team == 0.toShort() && it.id != 1u }.toMutableList()
@@ -316,7 +348,20 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     updatedPlayers.add(Player(players.value.size.toUInt() + 1u, "", roles[0]))
                     players.value = updatedPlayers
                     players.value = (players.value as MutableList<Player>).dropLast(1)
-                }) {
+                }, elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                )
+            ) {
                 Text(
                     text = "Раздать роли", style = TextStyle(
                         fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
@@ -326,10 +371,11 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Button(modifier = Modifier
-                .height(60.dp)
-                .weight(1f)
-                .border(3.dp, Color.Black),
+            Button(
+                modifier = Modifier
+                    .height(60.dp)
+                    .weight(1f)
+                    .border(3.dp, Color.Black),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
@@ -340,7 +386,20 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 onClick = {
                     game.value = Game(players.value)
                     navController.navigate("gameScreen")
-                }) {
+                }, elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                )
+            ) {
                 Text(
                     text = "Начать игру", style = TextStyle(
                         fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
@@ -404,10 +463,11 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 .height(50.dp)
                 .align(Alignment.CenterVertically)
         ) {
-            Button(modifier = Modifier
-                .height(50.dp)
-                .width(35.dp)
-                .padding(0.dp),
+            Button(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(35.dp)
+                    .padding(0.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray)),
                     contentColor = Color.White // Adjust as needed
@@ -418,7 +478,20 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     val playerList = players.value.toMutableList()
                     playerList.remove(player)
                     players.value = playerList
-                }) {
+                }, elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                )
+            ) {
                 Text(
                     text = "X",
                     style = TextStyle(
@@ -427,7 +500,7 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
-                        .wrapContentSize(Alignment.Center) // This centers the text within the button
+                        .wrapContentSize(Alignment.Center)
                 )
             }
         }
@@ -449,22 +522,42 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
             modifier = Modifier
                 .width(150.dp)
                 .height(50.dp)
-                .padding(0.dp)
         ) {
-            OutlinedTextField(textStyle = TextStyle(fontSize = 18.sp),
-                value = name!!,
-                onValueChange = { newName ->
-                    name = newName
-                    updatePlayer(index, players, newName, role)
+            var text by remember { mutableStateOf(name!!) }
+            var isTextEmpty by remember { mutableStateOf(text.isEmpty()) }
+
+            BasicTextField(
+                value = text,
+                onValueChange = { newText ->
+                    text = newText
+                    name = newText
+                    updatePlayer(index, players, newText, role)
+                    isTextEmpty = newText.isEmpty()
                 },
                 singleLine = true,
-                placeholder = {
-                    Text(
-                        "Введите имя", style = TextStyle(
-                            fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
-                        )
+                textStyle = TextStyle(fontSize = 18.sp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RectangleShape
                     )
-                })
+                    .padding(10.dp, 15.dp)
+
+            )
+
+            if (isTextEmpty) {
+                Text(
+                    "Введите имя",
+                    style = TextStyle(
+                        fontSize = 17.sp,
+                        color = Color.Gray,
+                        fontFamily = FontFamily.SansSerif
+                    ),
+                    modifier = Modifier.padding(10.dp, 15.dp)
+                )
+            }
         }
         Box(
             modifier = Modifier
@@ -555,7 +648,7 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
             )
 
             Text(
-                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "ночь" else "день"}",
+                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "Ночь" else "День"}",
                 style = TextStyle(
                     fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ),
@@ -570,7 +663,7 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.2f),
+                .fillMaxHeight(.15f),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
@@ -581,6 +674,19 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
                             context, R.color.green_main
                         )
                     )
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
                 )
             ) {
                 Text(
@@ -624,7 +730,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
     ) {
         Box(
             modifier = Modifier
-                .width(if (isLongNameBox) 120.dp else 86.dp)
+                .width(if (isLongNameBox) 120.dp else 90.dp)
                 .height(60.dp)
                 .border(1.dp, Color.Black)
                 .background(
@@ -713,35 +819,99 @@ fun TimerComponent() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { if (timeLeft < 540_000) timeLeft += 60_000 }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+            Button(
+                onClick = { if (timeLeft < 540_000) timeLeft += 60_000 },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) { Text("+1мин") }
-            Button(onClick = { if (timeLeft < 600_000) timeLeft += 10_000 }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) { Text("+1мин") }
+            Button(
+                onClick = { if (timeLeft < 600_000) timeLeft += 10_000 },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) { Text("+10сек") }
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) { Text("+10сек") }
 
-            Button(onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+            Button(
+                onClick = { if (timeLeft > 10_000) timeLeft -= 10_000 },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) { Text("-10сек") }
-            Button(onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) { Text("-10сек") }
+            Button(
+                onClick = { if (timeLeft > 60_000) timeLeft -= 60_000 },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) { Text("-1мин") }
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) { Text("-1мин") }
         }
 
         Row(
@@ -749,41 +919,72 @@ fun TimerComponent() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = {
-                if (timerState == TimerState.Running) {
-                    timerState = TimerState.Paused
-                    timerJob?.cancel()
-                } else {
-                    timerState = TimerState.Running
-                    timerJob?.cancel()
-                    timerJob = timer.launch {
-                        while (timeLeft > 0 && timerState == TimerState.Running) {
-                            delay(1000)
-                            if (timerState == TimerState.Running) timeLeft -= 1000
+            Button(
+                modifier = Modifier.width(140.dp),
+                onClick = {
+                    if (timerState == TimerState.Running) {
+                        timerState = TimerState.Paused
+                        timerJob?.cancel()
+                    } else {
+                        timerState = TimerState.Running
+                        timerJob?.cancel()
+                        timerJob = timer.launch {
+                            while (timeLeft > 0 && timerState == TimerState.Running) {
+                                delay(1000)
+                                if (timerState == TimerState.Running) timeLeft -= 1000
+                            }
                         }
                     }
-                }
-            }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+                }, colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) {
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) {
                 Text(if (timerState == TimerState.Running) "Остановить" else "Запустить")
             }
             Spacer(modifier = Modifier.width(8.dp))
 
-            Button(onClick = {
-                timerState = TimerState.Stopped
-                timeLeft = 60_000L
-            }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color(
-                    ContextCompat.getColor(
-                        context, R.color.green_main
+            Button(
+                onClick = {
+                    timerState = TimerState.Stopped
+                    timeLeft = 60_000L
+                }, colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context, R.color.green_main
+                        )
                     )
-                )
-            )) { Text("Сбросить") }
+                ),
+                elevation = ButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 2.dp,
+                    disabledElevation = 0.dp,
+                    hoveredElevation = 1.dp,
+                    focusedElevation = 1.dp
+                ),
+                contentPadding = PaddingValues(
+                    start = 4.dp,
+                    top = 0.dp,
+                    end = 4.dp,
+                    bottom = 0.dp,
+                ),
+            ) { Text("Сбросить") }
         }
     }
 }
