@@ -11,10 +11,13 @@ class Role(private val context: Context, roleDTO: RoleDTO) {
     val team: Short
     val actFrequency: Short
     val icon: Int?
+    val actIcon: Int?
     val isDoKill: Boolean
     val isDoSave: Boolean
     /* TODO: реализовать шерифа сканирование*/
     val code: String?
+    val actCode: String?
+
     init {
         id = roleDTO.id
         name = roleDTO.name
@@ -24,9 +27,12 @@ class Role(private val context: Context, roleDTO: RoleDTO) {
         team = roleDTO.team
         actFrequency = roleDTO.actFrequency
         icon = roleDTO.icon
+        actIcon = roleDTO.actionIcon
         isDoKill = roleDTO.isDoKill
         isDoSave = roleDTO.isDoSave
         code = roleDTO.code
+        actCode = roleDTO.actCode
+
     }
 
     // Метод для выполнения действия роли

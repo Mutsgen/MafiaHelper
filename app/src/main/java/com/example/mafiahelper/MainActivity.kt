@@ -114,7 +114,8 @@ class MainActivity : ComponentActivity() {
             }
         } else {
             backPressedOnce = true
-            Toast.makeText(this, "Данное действие сбросит текущую сессию", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Данное действие сбросит текущую сессию", Toast.LENGTH_SHORT)
+                .show()
             lastBackPressedTime = System.currentTimeMillis()
             Handler(Looper.getMainLooper()).postDelayed({ backPressedOnce = false }, 2000)
         }
@@ -222,7 +223,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
      * 3 - доктор
      */
     var roles = getBaseRoles(context)
-    var players:  MutableState<List<Player>> = remember { mutableStateOf<List<Player>>(listOf()) }
+    var players: MutableState<List<Player>> = remember { mutableStateOf<List<Player>>(listOf()) }
     if (game.value != null && game.value!!._players.size > 4) {
         val newPlayers = mutableListOf<Player>()
         for (player in game.value!!._players) {
@@ -231,12 +232,12 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
         players.value = newPlayers
     } else {
         if (roles != null && players.value.isEmpty()) {
-        val newPlayers = mutableListOf<Player>()
-        for (role in roles) {
-            newPlayers.add(Player(newPlayers.size.toUInt() + 1u, "", roles[0]))
+            val newPlayers = mutableListOf<Player>()
+            for (role in roles) {
+                newPlayers.add(Player(newPlayers.size.toUInt() + 1u, "", roles[0]))
+            }
+            players.value = newPlayers
         }
-        players.value = newPlayers
-    }
     }
     val focusManager = LocalFocusManager.current
 
@@ -281,7 +282,14 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     .height(60.dp)
                     .weight(1f)
                     .border(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray))),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.glassyGray
+                        )
+                    )
+                ),
                 onClick = {
                     if (players.value.size < 12) players.value = players.value + Player(
                         players.value[players.value.size - 1]._number + 1u, "", roles!![0]
@@ -315,7 +323,14 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     .height(60.dp)
                     .weight(1f)
                     .border(1.dp, Color.Black),
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(ContextCompat.getColor(context, R.color.glassyGray))),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.glassyGray
+                        )
+                    )
+                ),
                 onClick = {
                     val whiteRoles =
                         roles!!.filter { it.team == 0.toShort() && it.id != 1u }.toMutableList()
@@ -585,14 +600,14 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
     ) {
         var expanded by remember { mutableStateOf(false) }
         Text(
-            "${selectedRole.code ?: ""} ${selectedRole.name}",
+            "${selectedRole.code ?: ""} ${selectedRole.name} ${if (selectedRole.isDoNight) selectedRole.actCode ?: "" else ""}",
             Modifier
                 .clickable { expanded = true }
                 .align(Alignment.Center)
                 .fillMaxWidth()
                 .fillMaxHeight(.7f),
             style = TextStyle(
-                fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
             ),
             textAlign = TextAlign.Center,
         )
@@ -605,7 +620,7 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
                 }) {
                     Text(
                         "${role.code ?: ""} ${role.name}", style = TextStyle(
-                            fontSize = 22.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                            fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                         )
                     )
                 }
@@ -773,7 +788,7 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 ),
         ) {
             Text(
-                text = "${player._role.code} ${if (!isLongNameBox) player._role.name else ""}",
+                text = "${if (player._role.name != "Мирный" && !isLongNameBox) player._role.actCode else if (isLongNameBox) player._role.actCode else ""} ${if (!isLongNameBox) player._role.name else ""}",
                 style = TextStyle(
                     fontSize = 20.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ),
@@ -950,7 +965,8 @@ fun TimerComponent() {
                             }
                         }
                     }
-                }, colors = ButtonDefaults.buttonColors(
+                },
+                colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
                             context, R.color.green_main
@@ -979,7 +995,8 @@ fun TimerComponent() {
                 onClick = {
                     timerState = TimerState.Stopped
                     timeLeft = 60_000L
-                }, colors = ButtonDefaults.buttonColors(
+                },
+                colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
                             context, R.color.green_main
