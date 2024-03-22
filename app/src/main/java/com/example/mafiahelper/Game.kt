@@ -32,27 +32,33 @@ class Game(players: List<Player> = listOf()) {
     }
 
     private fun setDon() {
-        nowDon = _players.firstOrNull { it._role.name == "Мафия" && it._isAlive } ?: return
+        nowDon = _players.firstOrNull { it._role.name == "Мафия" && it._isAlive }
     }
 
-    fun closeStage() {
+    fun closeStage(): Game {
         setDon()
         when (currentStage) {
             Stages.NIGHT -> performNightActions()
             Stages.DAY -> performDayActions()
         }
         swapStage()
+
+        return Game(_players).apply {
+            currentDay = this@Game.currentDay
+            currentStage = this@Game.currentStage
+        }
     }
 
     private fun performNightActions(): Int {
         return try {
             nowDon?.let { don ->
-                if (don._role.actFrequency % currentDay == 0) {
+                if (don._role.actFrequency % currentDay == 0 && don._target != null) {
                     don.doAction(don._target!!, currentDay, currentStage)
                 }
             }
-            _players.filter { it._role.name != "Мафия" }
+            _players.filter { it._role.name != "Мафия" && it._target != null}
                 .forEach { it.doAction(it._target!!,  currentDay, currentStage) }
+            println(this.toString())
             1
         } catch (error: Exception) {
             0
@@ -62,6 +68,7 @@ class Game(players: List<Player> = listOf()) {
     private fun performDayActions() {
         nowVoteTarget?.let { it._isAlive = false }
         nowVoteTarget = null
+        println(this.toString())
     }
 
     fun returnNowActions() {

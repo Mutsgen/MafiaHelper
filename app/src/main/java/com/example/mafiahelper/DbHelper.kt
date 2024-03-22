@@ -20,10 +20,13 @@ data class RoleDTO(
     val team: Short, // 0 - white, 1 - red, 2 - another
     val actFrequency: Short,
     val icon: Int?,
+    val actionIcon: Int?,
     val isDoKill: Boolean,
     val isDoSave: Boolean,
     /* TODO: реализовать шерифа сканирование*/
-    val code: String?
+    val code: String?,
+    val actCode: String?
+
 )
 
 //for create database and fill it from start
@@ -89,10 +92,10 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
 
     private fun fillRolesTableWithStandard(db: SQLiteDatabase?) {
         try {
-            db!!.execSQL("insert into roles values(NULL, 'Мирный', 1, 0, 1, 0, 0, 439, 0, 0), " +
-                    "(NULL, 'Мафия', 1, 1, 1, 1, 1, 459, 1, 0), " +
-                    "(NULL, 'Шериф', 1, 1, 1, 0, 1, 231, 0, 0), " +
-                    "(NULL, 'Доктор', 1, 1, 1, 0, 1, 1262, 0, 1)")
+            db!!.execSQL("insert into roles values(NULL, 'Мирный', 1, 0, 1, 0, 0, 439, 1, 0, 0), " +
+                    "(NULL, 'Мафия', 1, 1, 1, 1, 1, 459, 818, 1, 0), " +
+                    "(NULL, 'Шериф', 1, 1, 1, 0, 1, 231, 889, 0, 0), " +
+                    "(NULL, 'Доктор', 1, 1, 1, 0, 1, 1262, 866, 0, 1)")
         }
         catch (e: Exception) {
             throw Exception("Incorrect database link")
@@ -148,16 +151,23 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
         val team = cursor.getShort(cursor.getColumnIndex("team"))
         val actFrequency = cursor.getShort(cursor.getColumnIndex("actFrequency"))
         val icon = cursor.getInt(cursor.getColumnIndex("icon"))
+        val actionIcon = cursor.getInt(cursor.getColumnIndex("actionIcon"))
         val isDoKill = cursor.getInt(cursor.getColumnIndex("isDoKill")) > 0
         val isDoSave = cursor.getInt(cursor.getColumnIndex("isDoSave")) > 0
-        val code = cursor.getString(cursor.getColumnIndex("code"))
+        val code = cursor.getString(cursor.getColumnIndex("role_icon"))
+        val actCode = cursor.getString(cursor.getColumnIndex("action_icon"))
 
-        return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon,isDoKill, isDoSave, code)
+
+        return RoleDTO(id, name, isBaseRole, isDoNight, isCanDie, team, actFrequency, icon,actionIcon, isDoKill, isDoSave, code, actCode)
     }
 
     fun getBaseRoles(context: Context): List<Role>? {
         val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT roles.*, icons.code FROM roles, icons where isBaseRole = 1 and icons.id = roles.icon", null)
+        val cursor = db.rawQuery("SELECT roles.*, icons.code AS role_icon, icons2.code AS action_icon\n" +
+                "FROM roles\n" +
+                "JOIN icons ON roles.icon = icons.id\n" +
+                "JOIN icons AS icons2 ON roles.actionicon = icons2.id\n" +
+                "WHERE isBaseRole = 1;", null)
         val roles = mutableListOf<Role>()
 
         try {

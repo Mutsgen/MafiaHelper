@@ -3,10 +3,10 @@ package com.example.mafiahelper
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.addCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -71,14 +71,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.floor
 
-
 enum class TimerState {
     Stopped, Running, Paused
 }
 
-
 class MainActivity : ComponentActivity() {
-    var game: MutableState<Game?> = mutableStateOf(null)
+    private var game: MutableState<Game?> = mutableStateOf(null)
+
     private var backPressedOnce = false
     private var lastBackPressedTime = 0L
 
@@ -86,33 +85,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
-            dispatcher!!.addCallback(this) {
-                if (navController.currentDestination?.route == "preGameScreen") {
-                    val currentTime = System.currentTimeMillis()
-                    if (currentTime - lastBackPressedTime < 2000) {
-                        finish() // Закрыть приложение при двойном нажатии в течение 2 секунд
-                    } else {
-                        lastBackPressedTime = currentTime
-                        Toast.makeText(
-                            applicationContext,
-                            "Нажмите еще раз, чтобы закрыть приложение",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                } else {
-                    this.remove() // Удалите этот колбек
-                    navController.popBackStack() // Вызовите стандартное поведение кнопки "Назад"
-                }
-            }
 
             NavHost(navController = navController, startDestination = "loadingScreen") {
                 composable("loadingScreen") {
                     LoadingScreen(navController)
                 }
                 composable("letsStartScreen") {
-                    // IconSelectionDropdown(icons = getAllIconsFromDb(context = this@MainActivity))
                     LetsStartScreen(navController)
                 }
                 composable("preGameScreen") {
@@ -122,10 +100,25 @@ class MainActivity : ComponentActivity() {
                     GameScreen(navController, game)
                 }
             }
-
         }
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (backPressedOnce) {
+            if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
+                super.onBackPressed()
+            } else {
+                backPressedOnce = false
+                onBackPressed()
+            }
+        } else {
+            backPressedOnce = true
+            Toast.makeText(this, "Данное действие сбросит текущую сессию", Toast.LENGTH_SHORT).show()
+            lastBackPressedTime = System.currentTimeMillis()
+            Handler(Looper.getMainLooper()).postDelayed({ backPressedOnce = false }, 2000)
+        }
+    }
 }
 
 @SuppressLint("ResourceAsColor")
@@ -229,13 +222,21 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
      * 3 - доктор
      */
     var roles = getBaseRoles(context)
-    var players = remember { mutableStateOf<List<Player>>(listOf()) }
-    if (roles != null && players.value.isEmpty()) {
+    var players:  MutableState<List<Player>> = remember { mutableStateOf<List<Player>>(listOf()) }
+    if (game.value != null && game.value!!._players.size > 4) {
+        val newPlayers = mutableListOf<Player>()
+        for (player in game.value!!._players) {
+            newPlayers.add(player)
+        }
+        players.value = newPlayers
+    } else {
+        if (roles != null && players.value.isEmpty()) {
         val newPlayers = mutableListOf<Player>()
         for (role in roles) {
             newPlayers.add(Player(newPlayers.size.toUInt() + 1u, "", roles[0]))
         }
         players.value = newPlayers
+    }
     }
     val focusManager = LocalFocusManager.current
 
@@ -616,6 +617,7 @@ fun RoleSelector(player: Player, roles: List<Role>, players: MutableState<List<P
 @Composable
 fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
     val context = LocalContext.current
+    @Suppress("LocalVariableName") var _game by remember { game }
 
     Column(
         modifier = Modifier
@@ -642,13 +644,13 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 .height(50.dp), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = "День: ${game.value!!.currentDay}", style = TextStyle(
+                text = "День: ${_game!!.currentDay}", style = TextStyle(
                     fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ), modifier = Modifier.offset(0.dp, 5.dp)
             )
 
             Text(
-                text = "Стадия: ${if (game.value!!.currentStage == Stages.NIGHT) "Ночь" else "День"}",
+                text = "Стадия: ${if (_game!!.currentStage == Stages.NIGHT) "Ночь" else "День"}",
                 style = TextStyle(
                     fontSize = 34.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
                 ),
@@ -668,7 +670,7 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
         ) {
             Button(
                 modifier = Modifier.height(60.dp),
-                onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(
+                onClick = { _game = _game!!.closeStage() }, colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
                             context, R.color.green_main
@@ -780,6 +782,19 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 )
             )
         }
+
+        GamePlayerActions(game, player)
+    }
+}
+
+@Composable
+fun GamePlayerActions(game: MutableState<Game?>, currentPlayer: Player) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp), horizontalArrangement = Arrangement.Start
+    ) {
+
     }
 }
 
