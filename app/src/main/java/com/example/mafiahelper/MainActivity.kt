@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -157,7 +158,8 @@ fun LetsStartScreen(navController: NavHostController) {
                 ),
                 modifier = Modifier
                     .width(200.dp)
-                    .height(45.dp), colors = ButtonDefaults.buttonColors(
+                    .height(45.dp),
+                colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
                             context, R.color.green_main
@@ -227,7 +229,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
     if (game.value != null && game.value!!._players.size > 4) {
         val newPlayers = mutableListOf<Player>()
         for (player in game.value!!._players) {
-            newPlayers.add(player)
+            newPlayers.add(Player(player._number, player._name, player._role))
         }
         players.value = newPlayers
     } else {
@@ -285,14 +287,13 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
-                            context,
-                            R.color.glassyGray
+                            context, R.color.glassyGray
                         )
                     )
                 ),
                 onClick = {
                     if (players.value.size < 12) players.value = players.value + Player(
-                        players.value[players.value.size - 1]._number + 1u, "", roles!![0]
+                        if (players.value.isNotEmpty()) players.value[players.value.size - 1]._number + 1u else 1u, "", roles!![0]
                     )
                 },
                 elevation = ButtonDefaults.elevation(
@@ -326,8 +327,7 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
-                            context,
-                            R.color.glassyGray
+                            context, R.color.glassyGray
                         )
                     )
                 ),
@@ -364,7 +364,8 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                     updatedPlayers.add(Player(players.value.size.toUInt() + 1u, "", roles[0]))
                     players.value = updatedPlayers
                     players.value = (players.value as MutableList<Player>).dropLast(1)
-                }, elevation = ButtonDefaults.elevation(
+                },
+                elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 2.dp,
                     disabledElevation = 0.dp,
@@ -402,7 +403,8 @@ fun PreGameScreen(navController: NavHostController, game: MutableState<Game?>) {
                 onClick = {
                     game.value = Game(players.value)
                     navController.navigate("gameScreen")
-                }, elevation = ButtonDefaults.elevation(
+                },
+                elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 2.dp,
                     disabledElevation = 0.dp,
@@ -494,7 +496,8 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                     val playerList = players.value.toMutableList()
                     playerList.remove(player)
                     players.value = playerList
-                }, elevation = ButtonDefaults.elevation(
+                },
+                elevation = ButtonDefaults.elevation(
                     defaultElevation = 0.dp,
                     pressedElevation = 2.dp,
                     disabledElevation = 0.dp,
@@ -555,9 +558,7 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
                 modifier = Modifier
                     .fillMaxSize()
                     .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                        shape = RectangleShape
+                        width = 1.dp, color = Color.Black, shape = RectangleShape
                     )
                     .padding(10.dp, 15.dp)
 
@@ -565,13 +566,9 @@ fun PlayerRow(player: Player, index: Int, roles: List<Role>, players: MutableSta
 
             if (isTextEmpty) {
                 Text(
-                    "Введите имя",
-                    style = TextStyle(
-                        fontSize = 17.sp,
-                        color = Color.Gray,
-                        fontFamily = FontFamily.SansSerif
-                    ),
-                    modifier = Modifier.padding(10.dp, 15.dp)
+                    "Введите имя", style = TextStyle(
+                        fontSize = 17.sp, color = Color.Gray, fontFamily = FontFamily.SansSerif
+                    ), modifier = Modifier.padding(10.dp, 15.dp)
                 )
             }
         }
@@ -685,7 +682,8 @@ fun GameScreen(navController: NavHostController, game: MutableState<Game?>) {
         ) {
             Button(
                 modifier = Modifier.height(60.dp),
-                onClick = { _game = _game!!.closeStage() }, colors = ButtonDefaults.buttonColors(
+                onClick = { _game = _game!!.closeStage() },
+                colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
                             context, R.color.green_main
@@ -753,8 +751,9 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 .background(
                     color = Color(
                         ContextCompat.getColor(
-                            context, if (player._role.team == 0.toShort()) R.color.green_secondary
-                            else if (player._role.team == 1.toShort()) R.color.main_red_glassy
+                            context,
+                            if (player._role.team == 0.toShort() && player._isAlive) R.color.green_secondary
+                            else if (player._role.team == 1.toShort() && player._isAlive) R.color.main_red_glassy
                             else R.color.white
                         )
                     )
@@ -780,8 +779,9 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
                 .background(
                     color = Color(
                         ContextCompat.getColor(
-                            context, if (player._role.team == 0.toShort()) R.color.green_secondary
-                            else if (player._role.team == 1.toShort()) R.color.main_red_glassy
+                            context,
+                            if (player._role.team == 0.toShort() && player._isAlive) R.color.green_secondary
+                            else if (player._role.team == 1.toShort() && player._isAlive) R.color.main_red_glassy
                             else R.color.white
                         )
                     )
@@ -798,19 +798,119 @@ fun GamePlayerRow(game: MutableState<Game?>, player: Player, isLongNameBox: Bool
             )
         }
 
-        GamePlayerActions(game, player)
+        GamePlayerActions(game, player, game.value!!.returnNowActions())
     }
 }
 
 @Composable
-fun GamePlayerActions(game: MutableState<Game?>, currentPlayer: Player) {
-    Row(
+fun GamePlayerActions(
+    game: MutableState<Game?>, currentPlayer: Player, actions: MutableList<Player>
+) {
+    val context = LocalContext.current
+    if (game.value!!.currentStage == Stages.DAY && game.value!!.currentDay > 1) {
+        Button(
+            modifier = Modifier
+                .height(50.dp)
+                .width(50.dp)
+                .border(1.dp, Color.Black),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(
+                    ContextCompat.getColor(
+                        context, R.color.glassyGray
+                    )
+                )
+            ),
+            onClick = {
+                game.value!!.nowVoteTarget = currentPlayer
+                game.value = Game(game.value!!._players).apply {
+                    currentDay = game.value!!.currentDay
+                    currentStage = game.value!!.currentStage
+                    nowVoteTarget = currentPlayer
+                }
+            },
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 2.dp,
+                disabledElevation = 0.dp,
+                hoveredElevation = 1.dp,
+                focusedElevation = 1.dp
+            ),
+            contentPadding = PaddingValues(
+                start = 4.dp,
+                top = 0.dp,
+                end = 4.dp,
+                bottom = 0.dp,
+            ),
+            enabled = (game.value!!.nowVoteTarget != currentPlayer)
+        ) {
+            Text(
+                text = "X", style = TextStyle(
+                    fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                )
+            )
+        }
+    }
+    Spacer(modifier = Modifier.width(5.dp))
+    LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp), horizontalArrangement = Arrangement.Start
     ) {
+        items(actions.size) { index ->
+            if (actions[index].checkDoAction(
+                    currentPlayer, game.value!!.currentDay, game.value!!.currentStage
+                )
+            ) {
+                Button(
+                    modifier = Modifier
+                        .height(50.dp)
+                        .width(50.dp)
+                        .border(1.dp, Color.Black),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(
+                            ContextCompat.getColor(
+                                context, R.color.glassyGray
+                            )
+                        )
+                    ),
+                    onClick = {
+                        actions[index].selectTarget(
+                            currentPlayer, game.value!!.currentDay, game.value!!.currentStage
+                        )
+                        game.value = Game(game.value!!._players).apply {
+                            currentDay = game.value!!.currentDay
+                            currentStage = game.value!!.currentStage
+                        }
+                    },
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 2.dp,
+                        disabledElevation = 0.dp,
+                        hoveredElevation = 1.dp,
+                        focusedElevation = 1.dp
+                    ),
+                    contentPadding = PaddingValues(
+                        start = 4.dp,
+                        top = 0.dp,
+                        end = 4.dp,
+                        bottom = 0.dp,
+                    ),
+                    enabled = (currentPlayer != actions[index]._target && (actions[index].checkDoAction(
+                        currentPlayer, game.value!!.currentDay, game.value!!.currentStage
+                    )))
+                ) {
+                    Text(
+                        text = "${actions[index]._role.actCode}", style = TextStyle(
+                            fontSize = 18.sp, color = Color.Black, fontFamily = FontFamily.SansSerif
+                        )
+                    )
+                }
+                Spacer(modifier = Modifier.width(5.dp))
+            }
+        }
 
     }
+
 }
 
 
@@ -850,7 +950,7 @@ fun TimerComponent() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { if (timeLeft < 540_000) timeLeft += 60_000 },
+                onClick = { if (timeLeft <= 540_000) timeLeft += 60_000 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(
@@ -873,7 +973,7 @@ fun TimerComponent() {
                 ),
             ) { Text("+1мин") }
             Button(
-                onClick = { if (timeLeft < 600_000) timeLeft += 10_000 },
+                onClick = { if (timeLeft <= 590_000) timeLeft += 10_000 },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(
                         ContextCompat.getColor(

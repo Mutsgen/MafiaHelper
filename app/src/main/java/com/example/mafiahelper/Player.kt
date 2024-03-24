@@ -23,22 +23,30 @@ class Player(number: UInt, name: String?, role: Role) {
     }
 
     fun doAction(target: Player, day: Int, stage: Stages) {
-        if (this._isAlive
-            && !this._isDisabledCurrentDay
-            && target._isAlive
+
+        if (!this._isDisabledCurrentDay
             && this._role.canPerformAction(day, stage)) {
+            println("action by ${this._number} with role ${this._role.name} to ${target._number}")
             this._role.performAction(target)
         }
+    }
+    fun checkDoAction(target: Player, day: Int, stage: Stages): Boolean {
+        return (this._isAlive
+                && !this._isDisabledCurrentDay
+                && target._isAlive
+                && this._role.canPerformAction(day, stage))
     }
 
     fun doDie() {
         if (this._isAlive && !this._isSaveCurrentNight && this._role.isCanDie) {
             _isAlive = false
+            println("${this._number} is dead")
         }
     }
     fun doSave() {
         _isAlive = true
         _isSaveCurrentNight = true
+        println("${this._number} is alive")
     }
 
     fun dropNightModifiers() {

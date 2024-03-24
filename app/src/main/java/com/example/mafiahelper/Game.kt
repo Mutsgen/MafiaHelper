@@ -46,41 +46,52 @@ class Game(players: List<Player> = listOf()) {
         return Game(_players).apply {
             currentDay = this@Game.currentDay
             currentStage = this@Game.currentStage
+            nowVoteTarget = null
         }
     }
 
-    private fun performNightActions(): Int {
-        return try {
+    private fun performNightActions() {
+        try {
             nowDon?.let { don ->
-                if (don._role.actFrequency % currentDay == 0 && don._target != null) {
+                if (currentDay % don._role.actFrequency == 0 && don._target != null) {
+                    println("${don._target!!._number} by don")
                     don.doAction(don._target!!, currentDay, currentStage)
                 }
             }
             _players.filter { it._role.name != "Мафия" && it._target != null}
-                .forEach { it.doAction(it._target!!,  currentDay, currentStage) }
-            println(this.toString())
-            1
+                .forEach {
+                    println("${it._target!!._number} by smth")
+                    it.doAction(it._target!!,  currentDay, currentStage)
+                }
+            for (player in _players) {
+                player.dropNightModifiers()
+            }
+
         } catch (error: Exception) {
-            0
+            println(error)
         }
     }
 
     private fun performDayActions() {
-        nowVoteTarget?.let { it._isAlive = false }
+        nowVoteTarget?.let { it.doDie() }
         nowVoteTarget = null
         println(this.toString())
     }
 
-    fun returnNowActions() {
+    fun returnNowActions(): MutableList<Player> {
         val actions = mutableListOf<Player>()
-        if (nowDon != null) actions.add(nowDon!!)
+        if (nowDon != null && currentStage == Stages.NIGHT) actions.add(nowDon!!)
         else {
             setDon()
-            if (nowDon != null) actions.add(nowDon!!)
+            if (nowDon != null && currentStage == Stages.NIGHT) actions.add(nowDon!!)
         }
-        _players.filter { it._role.name != "Мафия" && it._isAlive &&
-                it._role.canPerformAction(currentDay, currentStage) }
+        _players.filter { it._role.name != "Мафия"
+                && it._isAlive
+                && !it._isDisabledCurrentDay
+                && it._role.canPerformAction(currentDay, currentStage) }
             .forEach {  actions.add(it) }
+
+        return actions
     }
 
 

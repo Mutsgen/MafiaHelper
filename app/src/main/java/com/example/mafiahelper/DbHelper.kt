@@ -92,10 +92,10 @@ class DbHelper(val context: Context, val factory: SQLiteDatabase.CursorFactory?)
 
     private fun fillRolesTableWithStandard(db: SQLiteDatabase?) {
         try {
-            db!!.execSQL("insert into roles values(NULL, 'Мирный', 1, 0, 1, 0, 0, 439, 439, 0, 0), " +
+            db!!.execSQL("insert into roles values(NULL, 'Мирный', 1, 0, 1, 0, 1, 439, 439, 0, 0), " +
                     "(NULL, 'Мафия', 1, 1, 1, 1, 1, 459, 818, 1, 0), " +
-                    "(NULL, 'Шериф', 1, 1, 1, 0, 1, 231, 889, 0, 0), " +
-                    "(NULL, 'Доктор', 1, 1, 1, 0, 1, 1262, 866, 0, 1)")
+                    "(NULL, 'Шериф', 1, 1, 1, 0, 1, 231, 1246, 0, 0), " +
+                    "(NULL, 'Доктор', 1, 1, 1, 0, 1, 1131, 866, 0, 1)")
         }
         catch (e: Exception) {
             throw Exception("Incorrect database link")
