@@ -808,6 +808,7 @@ fun GamePlayerActions(
 ) {
     val context = LocalContext.current
     if (game.value!!.currentStage == Stages.DAY && game.value!!.currentDay > 1) {
+        Spacer(modifier = Modifier.width(5.dp))
         Button(
             modifier = Modifier
                 .height(50.dp)
